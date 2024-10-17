@@ -39,8 +39,8 @@
             </ListView.View>
         </ListView>
 
-        <Button Grid.Column="1" Grid.Row="5" Width="150" HorizontalAlignment="Left" Content="Boka" Click="BokaKnapp_Click"/>
-        <Button Grid.Column="1" Grid.Row="5" Width="150" HorizontalAlignment="Right" Content="Avboka" Click="AvbokaKnapp_Click"/>
+        <Button Content="Boka" Grid.Column="1" Grid.Row="5" Width="150" HorizontalAlignment="Left" Click="BokaKnapp_Click"/>
+        <Button Content="Avboka" Grid.Column="1" Grid.Row="5" Width="150" HorizontalAlignment="Right" Click="AvbokaKnapp_Click"/>
 
 
     </Grid>

@@ -3,24 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MyFirstWpfApp;
 
-namespace MyFirstWpfApp
+namespace MyFirstWpfApp.Model;
+
+public class Pass
 {
-    public class Pass
-    {
-        public string Namn { get; set; }
-        public string Kategori { get; set; }
-        public string Tid { get; set; }
-        public int AntalPLatser { get; set; }
-        public int BokadePlatser { get; set; }
+    public string Namn { get; set; }
+    public string Kategori { get; set; }
+    public string Tid { get; set; }
+    public int AntalPlatser { get; set; }
+    public int BokadePlatser { get; set; }
 
-        public Pass(string namn, string katergori, string tid, int antalplatser)
+    public bool ÄrFullbokat => BokadePlatser >= AntalPlatser;
+
+    public Pass(string namn, string kategori, string tid, int antalPlatser)
+    {
+        Namn = namn;
+        Kategori = kategori;
+        Tid = tid;
+        AntalPlatser = antalPlatser;
+        BokadePlatser = 0;
+    }
+
+    public void BokaPlats()
+    {
+        if (!ÄrFullbokat)
         {
-            Namn = namn;
-            Kategori = katergori;
-            Tid = tid;
-            AntalPLatser = antalplatser;
-            BokadePlatser = 0;
+            BokadePlatser++;
         }
+    }
+
+    public void AvbokaPlats()
+    {
+        if (BokadePlatser > 0)
+        {
+            BokadePlatser--;
+        }
+
     }
 }

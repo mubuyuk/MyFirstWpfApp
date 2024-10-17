@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyFirstWpfApp
+
+namespace MyFirstWpfApp.Model
 {
     class Bokningshantering
     {
@@ -21,7 +22,19 @@ namespace MyFirstWpfApp
         }
 
 
+        public bool BokaPass(Pass pass)
+        {
+            if (!pass.ÄrFullbokat)
+            {
+                pass.BokaPlats();
+                return true;
+            }
+            return false;
+        }
+
+        public void AvbokaPass(Pass pass)
+        {
+            pass.AvbokaPlats();
+        }
     }
-
-
 }
