@@ -24,7 +24,7 @@ namespace MyFirstWpfApp
 
             //FiltreraComboBox.ItemsSource = typeof(Pass).GetProperties().Select((o) => o.Name);
 
-            
+            //ListViewVisaPass.Items.Filter = NamnFilter;
         }
 
         // Metod för att lägga till pass
@@ -35,9 +35,70 @@ namespace MyFirstWpfApp
             bokningshantering.LäggTillPass(new Pass("Crossfit", "Styrka", "10:00", 10));
             bokningshantering.LäggTillPass(new Pass("Padel", "Kondition", "11:00", 4));
             bokningshantering.LäggTillPass(new Pass("Pilates", "Flexibilitet", "12:00", 35));
-
-            
+    
         }
+
+        public Predicate<object> GetFilter() 
+        { 
+            switch (FiltreraComboBox.SelectedItem as string) 
+            {
+                case "Namn":
+                    return NamnFilter;
+
+                case "Kategori":
+                    return KategoriFilter;
+
+                case "Tid":
+                    return TidFilter;
+            }
+
+            return NamnFilter;
+        }
+        
+
+        private bool NamnFilter(object obj)
+        {
+            var Filterobj = obj as Pass;
+
+            return Filterobj.Namn.Contains(SökTextBox.Text,StringComparison.OrdinalIgnoreCase);
+
+        }
+
+        private bool KategoriFilter(object obj)
+        {
+            var Filterobj = obj as Pass;
+
+            return Filterobj.Kategori.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
+
+        }
+
+        private bool TidFilter(object obj)
+        {
+            var Filterobj = obj as Pass;
+
+            return Filterobj.Tid.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
+
+        }
+
+        private void SökTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (SökTextBox.Text == null)
+            {
+                ListViewVisaPass.Items.Filter = null;
+            }
+
+            else
+            {
+                ListViewVisaPass.Items.Filter = GetFilter();
+            }
+        }
+
+        private void FiltreraComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ListViewVisaPass.Items.Filter = GetFilter();
+
+        }
+
 
         // Uppdatera ListView med en lista över pass
         private void UppdateraListView(List<Pass> Pass)
@@ -86,23 +147,7 @@ namespace MyFirstWpfApp
             }
         }
 
-
-
-
-
-
-
-
-        //private void BokaKnapp_Click(object sender, RoutedEventArgs e)
-        //{
-        //    anvandare.Boka();  // Anropar användarens bokningsmetod
-        //}
-
-        //private void AvbokaKnapp_Click(object sender, RoutedEventArgs e)
-        //{
-        //    anvandare.AvBoka(); // Anropar användarens avbokningsmetod
-        //}
-
+       
     }
 }
 

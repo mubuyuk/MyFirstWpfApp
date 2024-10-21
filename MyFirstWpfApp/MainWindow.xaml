@@ -23,9 +23,9 @@
             <RowDefinition Height="15"/>
         </Grid.RowDefinitions>
 
-        <ComboBox Name="FiltreraComboBox" SelectedIndex="0" Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Left"/>
+        <ComboBox Name="FiltreraComboBox" SelectionChanged="FiltreraComboBox_SelectionChanged" SelectedIndex="0" Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Left"/>
 
-        <TextBox x:Name="SökTextBox" Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Right"/>
+        <TextBox x:Name="SökTextBox" TextChanged="SökTextBox_TextChanged" Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Right"/>
 
         <ListView x:Name="ListViewVisaPass" Grid.Row="3" Grid.Column="1">
             <ListView.View>
