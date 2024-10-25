@@ -26,6 +26,15 @@ public class Pass
         BokadePlatser = 0;
     }
 
+    public Pass(string namn, string kategori, string tid, int antalPlatser, int bokadePlatser)
+    {
+        Namn = namn;
+        Kategori = kategori;
+        Tid = tid;
+        AntalPlatser = antalPlatser;
+        BokadePlatser = bokadePlatser;
+    }
+
     public void BokaPlats()
     {
         if (!ÄrFullbokat)

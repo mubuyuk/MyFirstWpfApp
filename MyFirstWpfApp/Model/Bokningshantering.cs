@@ -10,6 +10,7 @@ namespace MyFirstWpfApp.Model
     class Bokningshantering
     {
         public List<Pass> träningspass = new List<Pass>();
+        public List<Användare> bokningar = new List<Användare>();
 
         public void LäggTillPass(Pass nyttPass)
         {
@@ -21,20 +22,30 @@ namespace MyFirstWpfApp.Model
             return träningspass;
         }
 
-
-        public bool BokaPass(Pass pass)
+        public bool HarBokatPass(Användare användare, Pass pass)
         {
-            if (!pass.ÄrFullbokat)
+            return bokningar.Any(b => b.Namn.Equals(användare.Namn) && b.BokadPass == pass);
+        }
+
+        public bool BokaPass(Användare användare, Pass pass)
+        {
+            if (!pass.ÄrFullbokat && !HarBokatPass(användare, pass))
             {
                 pass.BokaPlats();
+                bokningar.Add(new Användare(användare.Namn, pass));
                 return true;
             }
             return false;
         }
 
-        public void AvbokaPass(Pass pass)
+        public void AvbokaPass(Användare användare, Pass pass)
         {
-            pass.AvbokaPlats();
+            var användareAttTaBort = bokningar.FirstOrDefault(b => b.Namn.Equals(användare.Namn) && b.BokadPass == pass);
+            if (användareAttTaBort != null)
+            {
+                pass.AvbokaPlats();
+                bokningar.Remove(användareAttTaBort);
+            }
         }
     }
 }

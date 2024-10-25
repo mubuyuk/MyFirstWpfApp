@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyFirstWpfApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="bokningshanteringsapplikation" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="25"/>
@@ -24,10 +24,10 @@
         </Grid.RowDefinitions>
 
         <ComboBox Name="FiltreraComboBox" SelectionChanged="FiltreraComboBox_SelectionChanged" SelectedIndex="0" Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Left"/>
-
+        <TextBlock x:Name="InloggadAnvändareTextBlock" Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Center" Text="Inloggad: " Foreground="#FF4FAF2C" FontWeight="Bold"/>
         <TextBox x:Name="SökTextBox" TextChanged="SökTextBox_TextChanged" Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Right"/>
 
-        <ListView x:Name="ListViewVisaPass" Grid.Row="3" Grid.Column="1">
+        <ListView x:Name="ListViewVisaPass" Grid.Row="3" Grid.Column="1" FontSize="14">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Namn" Width="100" DisplayMemberBinding="{Binding Namn}"/>
@@ -39,8 +39,8 @@
             </ListView.View>
         </ListView>
 
-        <Button Content="Boka" Grid.Column="1" Grid.Row="5" Width="150" HorizontalAlignment="Left" Click="BokaKnapp_Click"/>
-        <Button Content="Avboka" Grid.Column="1" Grid.Row="5" Width="150" HorizontalAlignment="Right" Click="AvbokaKnapp_Click"/>
+        <Button Content="Boka" Grid.Column="1" Grid.Row="5" Width="150" HorizontalAlignment="Left" Click="BokaKnapp_Click" FontSize="14" Background="LightBlue"/>
+        <Button Content="Avboka" Grid.Column="1" Grid.Row="5" Width="150" HorizontalAlignment="Right" Click="AvbokaKnapp_Click" FontSize="14" Background="LightBlue"/>
 
 
     </Grid>

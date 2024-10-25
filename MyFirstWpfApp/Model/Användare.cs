@@ -7,9 +7,16 @@ using System.Windows;
 
 namespace MyFirstWpfApp.Model
 {
-    class Användare
+    public class Användare
     {
-        public string Namn {  get; set; }
+        public string Namn { get; set; }
+        public Pass BokadPass { get; set; }
+
+        public Användare(string namn, Pass bokadPass)
+        {
+            Namn = namn;
+            BokadPass = bokadPass;
+        }
 
         public Användare(string namn)
         {

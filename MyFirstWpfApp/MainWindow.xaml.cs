@@ -9,37 +9,47 @@ using MyFirstWpfApp.Model;
 namespace MyFirstWpfApp
 {
     public partial class MainWindow : Window
-    {
+    {   // Instans av Bokningshantering som innehåller alla pass och bokningar
         private Bokningshantering bokningshantering = new Bokningshantering();
-        private Användare anvandare = new Användare("Murat ");
+
+        // En instans av Användare för att simulera en inloggad användare
+        Användare AktivAnvändare = new Användare("Murat");
 
         public MainWindow()
         {
             InitializeComponent();
-            ListaPåPass();
+            ListaPåPass();  // Lägger till initiala pass till listan
             UppdateraListView(bokningshantering.GetAllaPass()); // Visa alla pass vid start
-        
 
-            FiltreraComboBox.ItemsSource = new List<string>() {"Namn", "Kategori", "Tid" };
+            // Sätter upp filtreringsalternativ för ComboBoxen
+            FiltreraComboBox.ItemsSource = new List<string>() {"Välj Kategori", "Namn", "Kategori", "Tid" };
 
-            //FiltreraComboBox.ItemsSource = typeof(Pass).GetProperties().Select((o) => o.Name);
+            // Användare för att simulera en inloggad användare i UI
+            InloggadAnvändareTextBlock.Text = $"Inloggad: {AktivAnvändare.Namn}";
 
-            //ListViewVisaPass.Items.Filter = NamnFilter;
         }
 
-        // Metod för att lägga till pass
+        // Metod för att lägga till pass till bokningshanteringen
         public void ListaPåPass()
         {
-            bokningshantering.LäggTillPass(new Pass("Yoga", "Flexibilitet", "8:00", 20));
-            bokningshantering.LäggTillPass(new Pass("Spinning", "Kondition", "9:00", 15));
-            bokningshantering.LäggTillPass(new Pass("Crossfit", "Styrka", "10:00", 10));
-            bokningshantering.LäggTillPass(new Pass("Padel", "Kondition", "11:00", 4));
-            bokningshantering.LäggTillPass(new Pass("Pilates", "Flexibilitet", "12:00", 35));
-    
+            // Skapa en lista över pass med information om namn, kategori, tid och antal platser
+            var passLista = new List<Pass>
+            {
+                new Pass("Yoga", "Flexibilitet", "8:00", 20),
+                new Pass("Spinning", "Kondition", "9:00", 15),
+                new Pass("Crossfit", "Styrka", "9:00", 10),
+                new Pass("Padel", "Kondition", "11:00", 4, 4),
+                new Pass("Pilates", "Flexibilitet", "12:00", 35)
+            };
+
+            // Lägg till varje pass i bokningshanteringen
+            passLista.ForEach(p => bokningshantering.LäggTillPass(p));
         }
 
+        // Metod som returnerar ett Predicate för filtrering beroende på valt alternativ i ComboBoxen
         public Predicate<object> GetFilter() 
-        { 
+        {
+            // Returnera ett specifikt filter baserat på vilket alternativ som valts i ComboBoxen
             switch (FiltreraComboBox.SelectedItem as string) 
             {
                 case "Namn":
@@ -54,8 +64,9 @@ namespace MyFirstWpfApp
 
             return NamnFilter;
         }
-        
 
+
+        // Filtreringsfunktion som kontrollerar om Namnet innehåller söktexten
         private bool NamnFilter(object obj)
         {
             var Filterobj = obj as Pass;
@@ -63,7 +74,7 @@ namespace MyFirstWpfApp
             return Filterobj.Namn.Contains(SökTextBox.Text,StringComparison.OrdinalIgnoreCase);
 
         }
-
+        // Filtreringsfunktion som kontrollerar om Kategorin innehåller söktexten
         private bool KategoriFilter(object obj)
         {
             var Filterobj = obj as Pass;
@@ -71,7 +82,7 @@ namespace MyFirstWpfApp
             return Filterobj.Kategori.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
 
         }
-
+        // Filtreringsfunktion som kontrollerar om Tiden innehåller söktexten
         private bool TidFilter(object obj)
         {
             var Filterobj = obj as Pass;
@@ -80,74 +91,81 @@ namespace MyFirstWpfApp
 
         }
 
+        // Metod som triggas när texten i sökfältet ändras
         private void SökTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (SökTextBox.Text == null)
-            {
-                ListViewVisaPass.Items.Filter = null;
-            }
-
-            else
-            {
-                ListViewVisaPass.Items.Filter = GetFilter();
-            }
+            // Sätt filtrering baserat på om söktexten är tom eller inte
+            ListViewVisaPass.Items.Filter = string.IsNullOrEmpty(SökTextBox.Text) ? null : GetFilter();
         }
 
+        // Metod som triggas när användaren ändrar val i ComboBoxen
         private void FiltreraComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // Använd det valda filtret baserat på användarens val
             ListViewVisaPass.Items.Filter = GetFilter();
-
         }
 
 
         // Uppdatera ListView med en lista över pass
         private void UppdateraListView(List<Pass> Pass)
         {
-            ListViewVisaPass.ItemsSource = null;
+            ListViewVisaPass.ItemsSource = null; // Nollställer källan för att tvinga uppdatering
             ListViewVisaPass.ItemsSource = Pass; // Sätt ny källa för ListView
-
         }
 
         // Metod för att boka ett pass
         private void BokaKnapp_Click(object sender, RoutedEventArgs e)
         {
+            // Hämtar det pass som är valt i ListView
             Pass valtPass = (Pass)ListViewVisaPass.SelectedItem;
 
-            if (valtPass != null)
+
+            if (valtPass != null) //Kontrollera att ett pass är valt
             {
-                if (bokningshantering.BokaPass(valtPass))
+                // Kontrollera om bokningen lyckas
+                if (bokningshantering.BokaPass(AktivAnvändare, valtPass))
                 {
-                    MessageBox.Show("Bokning lyckades!");
+                    MessageBox.Show("Bokning lyckades!", "Bekräftelse", MessageBoxButton.OK, MessageBoxImage.Information);
                     UppdateraListView(bokningshantering.GetAllaPass()); // Uppdatera efter bokning
                 }
                 else
                 {
-                    MessageBox.Show("Passet är fullbokat.");
+                    // Kontrollera om passet är fullbokat eller om användaren redan har bokat
+                    if (valtPass.ÄrFullbokat)
+                    {
+                        MessageBox.Show("Passet är fullbokat.", "Meddelande",MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else 
+                    {
+                        MessageBox.Show("Du har redan bokat detta pass.", "Meddelande", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    
                 }
             }
             else
             {
-                MessageBox.Show("Välj ett pass att boka.");
+                MessageBox.Show("Välj ett pass att boka!", "Meddelande", MessageBoxButton.OK, MessageBoxImage.Question);
             }
         }
 
+        // Metod för att avboka pass
         private void AvbokaKnapp_Click(object sender, RoutedEventArgs e)
         {
             Pass valtPass = (Pass)ListViewVisaPass.SelectedItem;
 
             if (valtPass != null)
             {
-                bokningshantering.AvbokaPass(valtPass);
-                MessageBox.Show("Bokning avbokad.");
+                bokningshantering.AvbokaPass(AktivAnvändare, valtPass);
+                MessageBox.Show("Din bokning är avbokad.", "Bekräftelse", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 UppdateraListView(bokningshantering.GetAllaPass()); // Uppdatera efter avbokning
             }
             else
             {
-                MessageBox.Show("Välj ett pass att avboka.");
+                MessageBox.Show("Välj ett pass att avboka!", "Meddelande", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
-       
+
     }
 }
 
