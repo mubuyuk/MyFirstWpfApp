@@ -22,7 +22,7 @@ namespace MyFirstWpfApp
             UppdateraListView(bokningshantering.GetAllaPass()); // Visa alla pass vid start
 
             // Sätter upp filtreringsalternativ för ComboBoxen
-            FiltreraComboBox.ItemsSource = new List<string>() {"Välj Kategori", "Namn", "Kategori", "Tid" };
+            FiltreraComboBox.ItemsSource = new List<string>() { "Namn", "Kategori", "Tid" };
 
             // Användare för att simulera en inloggad användare i UI
             InloggadAnvändareTextBlock.Text = $"Inloggad: {AktivAnvändare.Namn}";
@@ -46,50 +46,50 @@ namespace MyFirstWpfApp
             passLista.ForEach(p => bokningshantering.LäggTillPass(p));
         }
 
-        // Metod som returnerar ett Predicate för filtrering beroende på valt alternativ i ComboBoxen
-        public Predicate<object> GetFilter() 
+
+        public Predicate<object> GetFilter()
         {
-            // Returnera ett specifikt filter baserat på vilket alternativ som valts i ComboBoxen
-            switch (FiltreraComboBox.SelectedItem as string) 
+            return obj =>
             {
-                case "Namn":
-                    return NamnFilter;
+                var passObj = obj as Pass;
+                if (passObj == null) return false;
 
-                case "Kategori":
-                    return KategoriFilter;
+                string sökText = SökTextBox.Text ?? string.Empty;
 
-                case "Tid":
-                    return TidFilter;
-            }
-
-            return NamnFilter;
+                return FiltreraComboBox.SelectedItem switch
+                {
+                    "Namn" => passObj.Namn.Contains(sökText, StringComparison.OrdinalIgnoreCase),
+                    "Kategori" => passObj.Kategori.Contains(sökText, StringComparison.OrdinalIgnoreCase),
+                    "Tid" => passObj.Tid.Contains(sökText, StringComparison.OrdinalIgnoreCase),
+                    _ => false
+                };
+            };
         }
 
+        //// Filtreringsfunktion som kontrollerar om Namnet innehåller söktexten
+        //private bool NamnFilter(object obj)
+        //{
+        //    var Filterobj = obj as Pass;
 
-        // Filtreringsfunktion som kontrollerar om Namnet innehåller söktexten
-        private bool NamnFilter(object obj)
-        {
-            var Filterobj = obj as Pass;
+        //    return Filterobj.Namn.Contains(SökTextBox.Text,StringComparison.OrdinalIgnoreCase);
 
-            return Filterobj.Namn.Contains(SökTextBox.Text,StringComparison.OrdinalIgnoreCase);
+        //}
+        //// Filtreringsfunktion som kontrollerar om Kategorin innehåller söktexten
+        //private bool KategoriFilter(object obj)
+        //{
+        //    var Filterobj = obj as Pass;
 
-        }
-        // Filtreringsfunktion som kontrollerar om Kategorin innehåller söktexten
-        private bool KategoriFilter(object obj)
-        {
-            var Filterobj = obj as Pass;
+        //    return Filterobj.Kategori.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
 
-            return Filterobj.Kategori.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
+        //}
+        //// Filtreringsfunktion som kontrollerar om Tiden innehåller söktexten
+        //private bool TidFilter(object obj)
+        //{
+        //    var Filterobj = obj as Pass;
 
-        }
-        // Filtreringsfunktion som kontrollerar om Tiden innehåller söktexten
-        private bool TidFilter(object obj)
-        {
-            var Filterobj = obj as Pass;
+        //    return Filterobj.Tid.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
 
-            return Filterobj.Tid.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
-
-        }
+        //}
 
         // Metod som triggas när texten i sökfältet ändras
         private void SökTextBox_TextChanged(object sender, TextChangedEventArgs e)
