@@ -30,11 +30,12 @@
         <ListView x:Name="ListViewVisaPass" Grid.Row="3" Grid.Column="1" FontSize="14">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Namn" Width="100" DisplayMemberBinding="{Binding Namn}"/>
-                    <GridViewColumn Header="Kategori" Width="100" DisplayMemberBinding="{Binding Kategori}"/>
-                    <GridViewColumn Header="Tid" Width="50" DisplayMemberBinding="{Binding Tid}"/>
-                    <GridViewColumn Header="Platser" Width="60" DisplayMemberBinding="{Binding AntalPlatser}"/>
-                    <GridViewColumn Header="Bokade" Width="60" DisplayMemberBinding="{Binding BokadePlatser}"/>
+                    <GridViewColumn Header="Namn" Width="100" DisplayMemberBinding="{Binding Namn}" />
+                    <GridViewColumn Header="Kategori" Width="100" DisplayMemberBinding="{Binding Kategori}" />
+                    <GridViewColumn Header="Datum" Width="80" DisplayMemberBinding="{Binding FormateratDatum}" />
+                    <GridViewColumn Header="Tid" Width="60" DisplayMemberBinding="{Binding FormateradTid}" />
+                    <GridViewColumn Header="Platser" Width="60" DisplayMemberBinding="{Binding AntalPlatser}" />
+                    <GridViewColumn Header="Bokade" Width="60" DisplayMemberBinding="{Binding BokadePlatser}" />
                 </GridView>
             </ListView.View>
         </ListView>

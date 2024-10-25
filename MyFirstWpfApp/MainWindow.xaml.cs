@@ -4,12 +4,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using MyFirstWpfApp.Model;
-
+using System;
 
 namespace MyFirstWpfApp
 {
     public partial class MainWindow : Window
-    {   // Instans av Bokningshantering som innehåller alla pass och bokningar
+    {
+        // Instans av Bokningshantering som innehåller alla pass och bokningar
         private Bokningshantering bokningshantering = new Bokningshantering();
 
         // En instans av Användare för att simulera en inloggad användare
@@ -26,7 +27,6 @@ namespace MyFirstWpfApp
 
             // Användare för att simulera en inloggad användare i UI
             InloggadAnvändareTextBlock.Text = $"Inloggad: {AktivAnvändare.Namn}";
-
         }
 
         // Metod för att lägga till pass till bokningshanteringen
@@ -35,18 +35,58 @@ namespace MyFirstWpfApp
             // Skapa en lista över pass med information om namn, kategori, tid och antal platser
             var passLista = new List<Pass>
             {
-                new Pass("Yoga", "Flexibilitet", "8:00", 20),
-                new Pass("Spinning", "Kondition", "9:00", 15),
-                new Pass("Crossfit", "Styrka", "9:00", 10),
-                new Pass("Padel", "Kondition", "11:00", 4, 4),
-                new Pass("Pilates", "Flexibilitet", "12:00", 35)
+                new Pass("Yoga", "Flexibilitet", DateTime.Today.AddHours(8), 20),
+                new Pass("Spinning", "Kondition", DateTime.Today.AddHours(9), 15),
+                new Pass("Crossfit", "Styrka", DateTime.Today.AddHours(10), 10),
+                new Pass("Padel", "Kondition", DateTime.Today.AddHours(11), 4, 4),
+                new Pass("Pilates", "Flexibilitet", DateTime.Today.AddHours(12), 35)
             };
 
             // Lägg till varje pass i bokningshanteringen
             passLista.ForEach(p => bokningshantering.LäggTillPass(p));
         }
 
+        private void SökOchFiltreraPass()
+        {
+            var sökText = SökTextBox.Text ?? string.Empty; // Hämta texten från sökfältet
+            var valdKategori = FiltreraComboBox.SelectedItem as string;
 
+            
+            var resultat = bokningshantering.GetAllaPass().Where(p =>
+            {
+                switch (valdKategori)
+                {
+                    case "Namn":
+                        return p.Namn.Contains(sökText, StringComparison.OrdinalIgnoreCase);
+
+                    case "Kategori":
+                        return p.Kategori.Contains(sökText, StringComparison.OrdinalIgnoreCase);
+
+                    case "Tid":
+                        // Om ingen text anges i sökfältet, visa alla pass
+                        if (string.IsNullOrWhiteSpace(sökText)) return true;
+
+                        // Försök att omvandla söktexten till en giltig tid i formatet "HH:mm"
+                        if (DateTime.TryParseExact(sökText, "HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime valdTid))
+                        {
+                            // Jämför endast tiden i formatet "HH:mm"
+                            return p.Tid.ToString("HH:mm") == valdTid.ToString("HH:mm");
+                        }
+                        else
+                        {
+                            //MessageBox.Show("Ogiltigt tidsformat. Använd t.ex. '08:00'", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return false;
+                        }
+
+                    default:
+                        return true; // Om inget specifikt filter är valt, visa alla pass
+                }
+            }).ToList();
+
+            UppdateraListView(resultat); // Uppdatera ListView med det filtrerade resultatet
+        }
+
+        // Filtermetod som används av ListView för att filtrera objekt
         public Predicate<object> GetFilter()
         {
             return obj =>
@@ -60,51 +100,24 @@ namespace MyFirstWpfApp
                 {
                     "Namn" => passObj.Namn.Contains(sökText, StringComparison.OrdinalIgnoreCase),
                     "Kategori" => passObj.Kategori.Contains(sökText, StringComparison.OrdinalIgnoreCase),
-                    "Tid" => passObj.Tid.Contains(sökText, StringComparison.OrdinalIgnoreCase),
-                    _ => false
+                    "Tid" => DateTime.TryParseExact(sökText, "HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime valdTid) &&
+                             passObj.Tid.ToString("HH:mm") == valdTid.ToString("HH:mm"),
+                    _ => false 
                 };
             };
         }
 
-        //// Filtreringsfunktion som kontrollerar om Namnet innehåller söktexten
-        //private bool NamnFilter(object obj)
-        //{
-        //    var Filterobj = obj as Pass;
-
-        //    return Filterobj.Namn.Contains(SökTextBox.Text,StringComparison.OrdinalIgnoreCase);
-
-        //}
-        //// Filtreringsfunktion som kontrollerar om Kategorin innehåller söktexten
-        //private bool KategoriFilter(object obj)
-        //{
-        //    var Filterobj = obj as Pass;
-
-        //    return Filterobj.Kategori.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
-
-        //}
-        //// Filtreringsfunktion som kontrollerar om Tiden innehåller söktexten
-        //private bool TidFilter(object obj)
-        //{
-        //    var Filterobj = obj as Pass;
-
-        //    return Filterobj.Tid.Contains(SökTextBox.Text, StringComparison.OrdinalIgnoreCase);
-
-        //}
-
         // Metod som triggas när texten i sökfältet ändras
         private void SökTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // Sätt filtrering baserat på om söktexten är tom eller inte
-            ListViewVisaPass.Items.Filter = string.IsNullOrEmpty(SökTextBox.Text) ? null : GetFilter();
+            SökOchFiltreraPass();
         }
 
         // Metod som triggas när användaren ändrar val i ComboBoxen
         private void FiltreraComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Använd det valda filtret baserat på användarens val
-            ListViewVisaPass.Items.Filter = GetFilter();
+            SökOchFiltreraPass();
         }
-
 
         // Uppdatera ListView med en lista över pass
         private void UppdateraListView(List<Pass> Pass)
@@ -119,7 +132,6 @@ namespace MyFirstWpfApp
             // Hämtar det pass som är valt i ListView
             Pass valtPass = (Pass)ListViewVisaPass.SelectedItem;
 
-
             if (valtPass != null) //Kontrollera att ett pass är valt
             {
                 // Kontrollera om bokningen lyckas
@@ -133,13 +145,12 @@ namespace MyFirstWpfApp
                     // Kontrollera om passet är fullbokat eller om användaren redan har bokat
                     if (valtPass.ÄrFullbokat)
                     {
-                        MessageBox.Show("Passet är fullbokat.", "Meddelande",MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Passet är fullbokat.", "Meddelande", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                    else 
+                    else
                     {
                         MessageBox.Show("Du har redan bokat detta pass.", "Meddelande", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                    
                 }
             }
             else
@@ -164,8 +175,5 @@ namespace MyFirstWpfApp
                 MessageBox.Show("Välj ett pass att avboka!", "Meddelande", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-
-
     }
 }
-
