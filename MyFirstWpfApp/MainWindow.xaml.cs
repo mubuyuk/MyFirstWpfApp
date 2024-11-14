@@ -51,7 +51,7 @@ namespace MyFirstWpfApp
             var sökText = SökTextBox.Text ?? string.Empty; // Hämta texten från sökfältet
             var valdKategori = FiltreraComboBox.SelectedItem as string;
 
-            
+
             var resultat = bokningshantering.GetAllaPass().Where(p =>
             {
                 switch (valdKategori)
@@ -102,7 +102,7 @@ namespace MyFirstWpfApp
                     "Kategori" => passObj.Kategori.Contains(sökText, StringComparison.OrdinalIgnoreCase),
                     "Tid" => DateTime.TryParseExact(sökText, "HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime valdTid) &&
                              passObj.Tid.ToString("HH:mm") == valdTid.ToString("HH:mm"),
-                    _ => false 
+                    _ => false
                 };
             };
         }
@@ -166,9 +166,16 @@ namespace MyFirstWpfApp
 
             if (valtPass != null)
             {
-                bokningshantering.AvbokaPass(AktivAnvändare, valtPass);
-                MessageBox.Show("Din bokning är avbokad.", "Bekräftelse", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                UppdateraListView(bokningshantering.GetAllaPass()); // Uppdatera efter avbokning
+                if (bokningshantering.HarBokatPass(AktivAnvändare, valtPass))
+                {
+                    bokningshantering.AvbokaPass(AktivAnvändare, valtPass);
+                    MessageBox.Show("Din bokning är avbokad.", "Bekräftelse", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    UppdateraListView(bokningshantering.GetAllaPass()); // Uppdatera efter avbokning
+                }
+                else 
+                {
+                    MessageBox.Show("Du har inte bokat detta pass och kan därför inte avboka det.", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             else
             {
